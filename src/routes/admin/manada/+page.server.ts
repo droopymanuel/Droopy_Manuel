@@ -156,7 +156,7 @@ function readNewsForm(form: FormData): DogNewsInput {
 	return input;
 }
 
-/** Lee el bloque de salud (baños + veterinario) desde el formulario. */
+/** Lee el bloque de salud (baños, tratamientos + veterinario) desde el formulario. */
 function readHealthForm(form: FormData): DogHealthInput {
 	const text = (name: string): string | null => {
 		const value = form.get(name);
@@ -168,6 +168,11 @@ function readHealthForm(form: FormData): DogHealthInput {
 	return {
 		lastBath: text('lastBath'),
 		nextBath: text('nextBath'),
+		dewormingDate: text('dewormingDate'),
+		dewormingNext: text('dewormingNext'),
+		fleaTickDate: text('fleaTickDate'),
+		fleaTickNext: text('fleaTickNext'),
+		fleaTickProduct: text('fleaTickProduct'),
 		vetVisitDate: text('vetVisitDate'),
 		// Checkbox sin marcar no viene en FormData.
 		vetVisitDone: form.get('vetVisitDone') === 'on'

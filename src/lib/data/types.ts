@@ -113,8 +113,8 @@ export interface DogNews {
 // ------------------------------------------------------- Salud de la manada
 
 /**
- * Salud de un perrito: baños y visita anual del veterinario. Copia de
- * `Server/src/types.ts`: si cambia allí, cámbialo aquí.
+ * Salud de un perrito: baños, tratamientos y visita anual del veterinario.
+ * Copia de `Server/src/types.ts`: si cambia allí, cámbialo aquí.
  *
  * Vive en su propia tabla (1:1 con el perrito): si no hay fila o está vacía,
  * el perfil no muestra la sección.
@@ -123,6 +123,16 @@ export interface DogHealth {
 	dogSlug: Slug;
 	lastBath: ISODate | null;
 	nextBath: ISODate | null;
+	/** Desparasitante: fecha de aplicación. */
+	dewormingDate: ISODate | null;
+	/** Desparasitante: próximo refuerzo. */
+	dewormingNext: ISODate | null;
+	/** Antipulgas y garrapatas: fecha de aplicación. */
+	fleaTickDate: ISODate | null;
+	/** Antipulgas y garrapatas: próximo refuerzo. */
+	fleaTickNext: ISODate | null;
+	/** Antipulgas y garrapatas: nombre del producto. */
+	fleaTickProduct: string | null;
 	/** true = ya se hizo la visita anual. */
 	vetVisitDone: boolean;
 	/** Fecha de la visita anual (hecha o agendada). */
