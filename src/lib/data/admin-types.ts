@@ -130,6 +130,7 @@ export interface DogHealthInput {
 	nextBath?: string | null;
 	dewormingDate?: string | null;
 	dewormingNext?: string | null;
+	dewormingProduct?: string | null;
 	fleaTickDate?: string | null;
 	fleaTickNext?: string | null;
 	fleaTickProduct?: string | null;

@@ -127,6 +127,8 @@ export interface DogHealth {
 	dewormingDate: ISODate | null;
 	/** Desparasitante: próximo refuerzo. */
 	dewormingNext: ISODate | null;
+	/** Desparasitante: nombre del producto. */
+	dewormingProduct: string | null;
 	/** Antipulgas y garrapatas: fecha de aplicación. */
 	fleaTickDate: ISODate | null;
 	/** Antipulgas y garrapatas: próximo refuerzo. */

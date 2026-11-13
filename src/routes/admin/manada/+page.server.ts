@@ -170,6 +170,7 @@ function readHealthForm(form: FormData): DogHealthInput {
 		nextBath: text('nextBath'),
 		dewormingDate: text('dewormingDate'),
 		dewormingNext: text('dewormingNext'),
+		dewormingProduct: text('dewormingProduct'),
 		fleaTickDate: text('fleaTickDate'),
 		fleaTickNext: text('fleaTickNext'),
 		fleaTickProduct: text('fleaTickProduct'),
