@@ -2,11 +2,13 @@
 	import type { DogHealth, DogVaccine } from '#lib/data/types';
 
 	/**
-	 * Sección de salud del perfil: esterilizado, baños, visita anual y vacunas.
-	 * Presentacional: los datos llegan por props desde la capa API.
+	 * Sección de salud del perfil: esterilizado, baños, tratamientos (desparasitante
+	 * y antipulgas), visita anual y vacunas. Presentacional: los datos llegan por
+	 * props desde la capa API.
 	 *
-	 * Si no hay nada que contar (sin vacunas, sin baños, sin veterinario y sin
-	 * esterilizar) no renderiza nada: «sin datos» y «sin sección» son lo mismo.
+	 * Si no hay nada que contar (sin vacunas, sin baños, sin tratamientos, sin
+	 * veterinario y sin esterilizar) no renderiza nada: «sin datos» y «sin
+	 * sección» son lo mismo.
 	 */
 
 	interface Props {
@@ -22,8 +24,14 @@
 	const applied = $derived(vaccines.filter((vaccine) => vaccine.applied));
 	const pending = $derived(vaccines.filter((vaccine) => !vaccine.applied));
 	const hasBaths = $derived(Boolean(health && (health.lastBath || health.nextBath)));
+	const hasDeworming = $derived(Boolean(health && (health.dewormingDate || health.dewormingNext)));
+	const hasFleaTick = $derived(
+		Boolean(health && (health.fleaTickDate || health.fleaTickNext || health.fleaTickProduct))
+	);
 	const hasVet = $derived(Boolean(health && (health.vetVisitDone || health.vetVisitDate)));
-	const hasAny = $derived(vaccines.length > 0 || hasBaths || hasVet || sterilized);
+	const hasAny = $derived(
+		vaccines.length > 0 || hasBaths || hasDeworming || hasFleaTick || hasVet || sterilized
+	);
 
 	/** Fecha ISO (YYYY-MM-DD) → «10 de octubre de 2026». */
 	function formatDate(date: string): string {
@@ -70,8 +78,41 @@
 			{/if}
 		</dl>
 
+		{#if hasDeworming || hasFleaTick}
+			<div class="bloque">
+				<h5>Tratamientos</h5>
+				<ul>
+					{#if hasDeworming}
+						<li>
+							<span class="chip">Desparasitante</span>
+							{#if health?.dewormingDate}
+								<span class="fecha">Aplicado: {formatDate(health.dewormingDate)}</span>
+							{/if}
+							{#if health?.dewormingNext}
+								<span class="fecha">Refuerzo: {formatDate(health.dewormingNext)}</span>
+							{/if}
+						</li>
+					{/if}
+					{#if hasFleaTick}
+						<li>
+							<span class="chip">Antipulgas y garrapatas</span>
+							{#if health?.fleaTickProduct}
+								<span class="prod">{health.fleaTickProduct}</span>
+							{/if}
+							{#if health?.fleaTickDate}
+								<span class="fecha">Aplicado: {formatDate(health.fleaTickDate)}</span>
+							{/if}
+							{#if health?.fleaTickNext}
+								<span class="fecha">Próximo: {formatDate(health.fleaTickNext)}</span>
+							{/if}
+						</li>
+					{/if}
+				</ul>
+			</div>
+		{/if}
+
 		{#if vaccines.length > 0}
-			<div class="vacunas">
+			<div class="bloque">
 				<h5>Vacunas</h5>
 
 				{#if applied.length > 0}
@@ -151,9 +192,9 @@
 		margin: 0;
 	}
 
-	/* Toda la sección de vacunas va sobre una tarjeta blanca, como el bloque
-	   de datos de arriba: se lee como parte de «Salud», no como un aparte. */
-	.vacunas {
+	/* Cada bloque de la sección (tratamientos, vacunas) va sobre una tarjeta
+	   blanca, como el bloque de datos de arriba: se lee como parte de «Salud». */
+	.bloque {
 		margin-top: 0.875rem;
 		padding: 0.75rem;
 		border-radius: 0.75rem;
@@ -161,7 +202,7 @@
 		border: 1px solid color-mix(in srgb, var(--dog) 20%, white);
 	}
 
-	.vacunas h5 {
+	.bloque h5 {
 		margin: 0 0 0.375rem;
 		font-size: 1rem;
 		color: var(--dog);
@@ -176,7 +217,7 @@
 		opacity: 0.6;
 	}
 
-	.vacunas ul {
+	.bloque ul {
 		list-style: none;
 		display: grid;
 		gap: 0.5rem;
@@ -184,7 +225,7 @@
 		padding: 0;
 	}
 
-	.vacunas li {
+	.bloque li {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
@@ -204,6 +245,11 @@
 
 	.fecha {
 		opacity: 0.7;
+	}
+
+	/* Nombre del producto de antipulgas, junto al chip de la categoría. */
+	.prod {
+		font-weight: 700;
 	}
 
 	.rec {

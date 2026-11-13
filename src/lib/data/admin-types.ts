@@ -128,6 +128,11 @@ export interface DogNewsInput {
 export interface DogHealthInput {
 	lastBath?: string | null;
 	nextBath?: string | null;
+	dewormingDate?: string | null;
+	dewormingNext?: string | null;
+	fleaTickDate?: string | null;
+	fleaTickNext?: string | null;
+	fleaTickProduct?: string | null;
 	vetVisitDone?: boolean;
 	vetVisitDate?: string | null;
 }

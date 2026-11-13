@@ -530,6 +530,31 @@
 							<input name="nextBath" type="date" value={currentHealth?.nextBath ?? ''} />
 						</label>
 						<label>
+							Desparasitante: fecha de aplicación
+							<input name="dewormingDate" type="date" value={currentHealth?.dewormingDate ?? ''} />
+						</label>
+						<label>
+							Desparasitante: próximo refuerzo
+							<input name="dewormingNext" type="date" value={currentHealth?.dewormingNext ?? ''} />
+						</label>
+						<label>
+							Antipulgas: fecha de aplicación
+							<input name="fleaTickDate" type="date" value={currentHealth?.fleaTickDate ?? ''} />
+						</label>
+						<label>
+							Antipulgas: próximo
+							<input name="fleaTickNext" type="date" value={currentHealth?.fleaTickNext ?? ''} />
+						</label>
+						<label>
+							Antipulgas: nombre del producto
+							<input
+								name="fleaTickProduct"
+								maxlength="120"
+								placeholder="Bravecto, NexGard…"
+								value={currentHealth?.fleaTickProduct ?? ''}
+							/>
+						</label>
+						<label>
 							Fecha visita anual
 							<input name="vetVisitDate" type="date" value={currentHealth?.vetVisitDate ?? ''} />
 						</label>
