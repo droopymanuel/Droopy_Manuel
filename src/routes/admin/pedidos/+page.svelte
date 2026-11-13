@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
+	import AdminToast from '#lib/components/AdminToast.svelte';
 	import type { Order } from '#lib/data/types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -99,12 +100,7 @@
 	</div>
 </header>
 
-{#if form?.error}
-	<p class="alert error" role="alert">{form.error}</p>
-{/if}
-{#if form?.success}
-	<p class="alert ok" role="status">{form.message}</p>
-{/if}
+<AdminToast {form} />
 
 <form class="filters" onsubmit={applyFilters}>
 	<label>
@@ -318,25 +314,6 @@
 	.lead {
 		margin: 0;
 		color: #5b6470;
-	}
-
-	.alert {
-		margin: 0 0 1rem;
-		padding: 0.625rem 0.75rem;
-		border-radius: 0.5rem;
-		font-size: 0.9375rem;
-	}
-
-	.alert.error {
-		background: #fef2f2;
-		border: 1px solid #fecaca;
-		color: #b91c1c;
-	}
-
-	.alert.ok {
-		background: #f0fdf4;
-		border: 1px solid #bbf7d0;
-		color: #15803d;
 	}
 
 	.filters {
