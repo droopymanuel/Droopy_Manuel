@@ -24,7 +24,9 @@
 	const applied = $derived(vaccines.filter((vaccine) => vaccine.applied));
 	const pending = $derived(vaccines.filter((vaccine) => !vaccine.applied));
 	const hasBaths = $derived(Boolean(health && (health.lastBath || health.nextBath)));
-	const hasDeworming = $derived(Boolean(health && (health.dewormingDate || health.dewormingNext)));
+	const hasDeworming = $derived(
+		Boolean(health && (health.dewormingDate || health.dewormingNext || health.dewormingProduct))
+	);
 	const hasFleaTick = $derived(
 		Boolean(health && (health.fleaTickDate || health.fleaTickNext || health.fleaTickProduct))
 	);
@@ -85,6 +87,9 @@
 					{#if hasDeworming}
 						<li>
 							<span class="chip">Desparasitante</span>
+							{#if health?.dewormingProduct}
+								<span class="prod">{health.dewormingProduct}</span>
+							{/if}
 							{#if health?.dewormingDate}
 								<span class="fecha">Aplicado: {formatDate(health.dewormingDate)}</span>
 							{/if}

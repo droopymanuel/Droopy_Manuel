@@ -529,24 +529,41 @@
 							Próximo baño integral
 							<input name="nextBath" type="date" value={currentHealth?.nextBath ?? ''} />
 						</label>
+					</div>
+
+					<div class="grid grupo-salud">
+						<p class="grupo-label">Desparasitante</p>
 						<label>
-							Desparasitante: fecha de aplicación
+							Fecha de aplicación
 							<input name="dewormingDate" type="date" value={currentHealth?.dewormingDate ?? ''} />
 						</label>
 						<label>
-							Desparasitante: próximo refuerzo
+							Próximo refuerzo
 							<input name="dewormingNext" type="date" value={currentHealth?.dewormingNext ?? ''} />
 						</label>
 						<label>
-							Antipulgas: fecha de aplicación
+							Nombre del producto
+							<input
+								name="dewormingProduct"
+								maxlength="120"
+								placeholder="Drontal Plus, Milbemax…"
+								value={currentHealth?.dewormingProduct ?? ''}
+							/>
+						</label>
+					</div>
+
+					<div class="grid grupo-salud">
+						<p class="grupo-label">Antipulgas y garrapatas</p>
+						<label>
+							Fecha de aplicación
 							<input name="fleaTickDate" type="date" value={currentHealth?.fleaTickDate ?? ''} />
 						</label>
 						<label>
-							Antipulgas: próximo
+							Próximo
 							<input name="fleaTickNext" type="date" value={currentHealth?.fleaTickNext ?? ''} />
 						</label>
 						<label>
-							Antipulgas: nombre del producto
+							Nombre del producto
 							<input
 								name="fleaTickProduct"
 								maxlength="120"
@@ -554,8 +571,12 @@
 								value={currentHealth?.fleaTickProduct ?? ''}
 							/>
 						</label>
+					</div>
+
+					<div class="grid grupo-salud">
+						<p class="grupo-label">Visita anual</p>
 						<label>
-							Fecha visita anual
+							Fecha
 							<input name="vetVisitDate" type="date" value={currentHealth?.vetVisitDate ?? ''} />
 						</label>
 						<label class="inline end">
@@ -1063,6 +1084,24 @@
 		gap: 0.75rem;
 	}
 
+	/* Grupos del bloque Salud: cada tratamiento (baños, desparasitante,
+	   antipulgas, visita anual) va en su renglón, con una línea arriba. */
+	.grupo-salud {
+		margin-top: 0.875rem;
+		padding-top: 0.875rem;
+		border-top: 1px solid #e2e5e9;
+	}
+
+	.grupo-label {
+		grid-column: 1 / -1;
+		margin: 0;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: #6b7280;
+	}
+
 	label {
 		display: grid;
 		gap: 0.25rem;
@@ -1540,6 +1579,24 @@
 
 		.grid {
 			grid-template-columns: 1fr;
+		}
+
+		/* En pantalla angosta cada campo del grupo va en su renglón,
+		   separado por una línea. */
+		.grupo-salud {
+			gap: 0;
+		}
+
+		.grupo-salud > .grupo-label {
+			padding-bottom: 0.375rem;
+		}
+
+		.grupo-salud > label {
+			padding: 0.5rem 0;
+		}
+
+		.grupo-salud > label + label {
+			border-top: 1px solid #e2e5e9;
 		}
 
 		.actions button {
