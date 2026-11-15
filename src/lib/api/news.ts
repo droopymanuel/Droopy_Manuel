@@ -1,4 +1,10 @@
-import type { NewsCategoryInfo, NewsFilter, NewsItem, NewsPage } from '#lib/data/types';
+import type {
+	NewsCategoryInfo,
+	NewsFilter,
+	NewsItem,
+	NewsPage,
+	NewsSection
+} from '#lib/data/types';
 import { api } from './client';
 
 /** Capa de acceso a datos de noticias. Todo viene del backend. */
@@ -14,6 +20,16 @@ export async function getNewsCategories(): Promise<NewsCategoryInfo[]> {
 
 export async function getNewsItem(slug: string): Promise<NewsItem | null> {
 	return api.getOrNull<NewsItem>(`/api/news/${encodeURIComponent(slug)}`);
+}
+
+/**
+ * Secciones de todas las noticias.
+ *
+ * Lo usa el panel para agruparlas por `newsSlug` sin pedir una noticia por
+ * una. El detalle de cada noticia ya trae las suyas en `item.sections`.
+ */
+export async function getNewsSections(): Promise<NewsSection[]> {
+	return api.get<NewsSection[]>('/api/news/sections');
 }
 
 /**

@@ -1,8 +1,9 @@
 import { fail } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
-import type { Dog, NewsItem } from '#lib/data/types';
+import type { Dog, NewsItem, NewsSection } from '#lib/data/types';
 import { NEWS_CATEGORY_SLUGS } from '#lib/data/types';
+import type { NewsSectionInput } from '#lib/data/admin-types';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -14,20 +15,29 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ cookies }) => {
 	let items: NewsItem[] = [];
 	let dogs: Dog[] = [];
+	let sections: NewsSection[] = [];
 
 	try {
-		[items, dogs] = await Promise.all([
+		[items, dogs, sections] = await Promise.all([
 			serverApi.get<NewsItem[]>('/api/news', cookies),
-			serverApi.get<Dog[]>('/api/dogs', cookies)
+			serverApi.get<Dog[]>('/api/dogs', cookies),
+			serverApi.get<NewsSection[]>('/api/news/sections', cookies)
 		]);
 	} catch {
 		// Si la API no responde, la página sale vacía en vez de romperse.
+	}
+
+	// El editor muestra las secciones de la noticia que se está editando.
+	const sectionsByNews: Record<string, NewsSection[]> = {};
+	for (const section of sections) {
+		(sectionsByNews[section.newsSlug] ??= []).push(section);
 	}
 
 	return {
 		items,
 		// Para el selector de perritos relacionados.
 		dogs: dogs.map((dog) => ({ slug: dog.slug, name: dog.name })),
+		sectionsByNews,
 		categories: [...NEWS_CATEGORY_SLUGS]
 	};
 };
@@ -65,6 +75,39 @@ function readBody(form: FormData): string[] | undefined {
 		.split('\n')
 		.map((line) => line.trim())
 		.filter(Boolean);
+}
+
+/**
+ * Lee una sección del formulario.
+ *
+ * Los campos que no vengan se omiten: así el mismo lector sirve para editar
+ * (todos) y para subir/bajar (solo `position`). El título vacío se envía como
+ * `null` para quitar el encabezado de verdad.
+ */
+function readSectionInput(form: FormData): NewsSectionInput {
+	const input: NewsSectionInput = {};
+
+	if (form.has('kind')) {
+		const kind = String(form.get('kind') ?? '').trim();
+		if (kind !== '') input.kind = kind as NewsSectionInput['kind'];
+	}
+
+	if (form.has('position')) {
+		const raw = String(form.get('position') ?? '').trim();
+		if (raw !== '') {
+			const position = Number(raw);
+			if (Number.isInteger(position)) input.position = position;
+		}
+	}
+
+	if (form.has('title')) {
+		const title = String(form.get('title') ?? '').trim();
+		input.title = title === '' ? null : title;
+	}
+
+	if (form.has('body')) input.body = readBody(form);
+
+	return input;
 }
 
 /** Lee los perritos relacionados marcados en el formulario. */
@@ -167,6 +210,73 @@ export const actions: Actions = {
 			return { success: true, message: `${slug} se eliminó.` };
 		} catch (error) {
 			return fail(400, { error: actionError(error, 'No se pudo borrar la noticia.') });
+		}
+	},
+
+	/** Agrega una sección al cuerpo de la noticia. */
+	addSection: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = text(form.get('slug'));
+		if (!slug) return fail(400, { error: 'Falta la noticia de la sección.' });
+
+		const input = readSectionInput(form);
+		if (!input.kind) return fail(400, { error: 'Falta la clase de la sección.' });
+		if (input.body !== undefined && input.body.length === 0 && input.kind !== 'hero') {
+			return fail(400, { error: 'La sección necesita al menos un párrafo.' });
+		}
+
+		try {
+			await serverApi.post<NewsSection>(
+				`/api/admin/news/${encodeURIComponent(slug)}/sections`,
+				cookies,
+				input
+			);
+			return { success: true, message: 'Sección agregada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo crear la sección.') });
+		}
+	},
+
+	/** Edita una sección: campos sueltos o solo `position` para moverla. */
+	updateSection: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = text(form.get('slug'));
+		const id = Number(String(form.get('id') ?? '').trim());
+		if (!slug) return fail(400, { error: 'Falta la noticia de la sección.' });
+		if (!Number.isInteger(id) || id < 1) {
+			return fail(400, { error: 'Falta la sección a editar.' });
+		}
+
+		try {
+			await serverApi.patch<NewsSection>(
+				`/api/admin/news/${encodeURIComponent(slug)}/sections/${id}`,
+				cookies,
+				readSectionInput(form)
+			);
+			return { success: true, message: 'Sección actualizada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar la sección.') });
+		}
+	},
+
+	/** Borra una sección. La API exige rol admin. */
+	deleteSection: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = text(form.get('slug'));
+		const id = Number(String(form.get('id') ?? '').trim());
+		if (!slug) return fail(400, { error: 'Falta la noticia de la sección.' });
+		if (!Number.isInteger(id) || id < 1) {
+			return fail(400, { error: 'Falta la sección a borrar.' });
+		}
+
+		try {
+			await serverApi.delete(
+				`/api/admin/news/${encodeURIComponent(slug)}/sections/${id}`,
+				cookies
+			);
+			return { success: true, message: 'Sección eliminada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo borrar la sección.') });
 		}
 	}
 };

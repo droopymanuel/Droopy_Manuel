@@ -346,6 +346,29 @@ export const NEWS_CATEGORY_SLUGS = [
 /** Categoría de una noticia. `slug` para filtros, `label` para la UI. */
 export type NewsCategory = (typeof NEWS_CATEGORY_SLUGS)[number];
 
+/**
+ * Clases de sección del cuerpo de una noticia. Copia de
+ * `Server/src/types.ts` (NEWS_SECTION_KINDS): si cambia allí, cámbialo aquí.
+ * Las etiquetas viven en `./news-section-labels`.
+ */
+export const NEWS_SECTION_KINDS = ['hero', 'chapter', 'closing'] as const;
+
+export type NewsSectionKind = (typeof NEWS_SECTION_KINDS)[number];
+
+/**
+ * Un bloque editable del cuerpo de una noticia, en el orden de `position`.
+ * `title` nulo = sin encabezado visible. `body` son párrafos con `**negrita**`
+ * como único formato.
+ */
+export interface NewsSection {
+	id: number;
+	newsSlug: Slug;
+	position: number;
+	kind: NewsSectionKind;
+	title: string | null;
+	body: string[];
+}
+
 /** Noticia de la fundación. `slug` se usa en la ruta /noticias/[slug]. */
 export interface NewsItem {
 	slug: Slug;
@@ -365,6 +388,11 @@ export interface NewsItem {
 	emoji: string;
 	/** Slugs de perritos relacionados. */
 	relatedDogSlugs: Slug[];
+	/**
+	 * Bloques del cuerpo. Solo los sirve el detalle (`GET /api/news/:slug`);
+	 * el feed no los carga.
+	 */
+	sections?: NewsSection[];
 	featured?: boolean;
 }
 
