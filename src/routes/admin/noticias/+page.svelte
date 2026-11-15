@@ -355,6 +355,8 @@
 									<option value={kind}>{newsSectionKindLabels[kind]}</option>
 								{/each}
 							</select>
+							<!-- Reserva la fila del hint para que la columna mida igual que Posición. -->
+							<span class="hint" aria-hidden="true">&nbsp;</span>
 						</label>
 
 						<label>
