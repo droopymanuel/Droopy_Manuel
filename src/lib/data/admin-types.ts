@@ -14,6 +14,7 @@ import type {
 	DogVaccine,
 	DonationTier,
 	NewsItem,
+	NewsSection,
 	Order,
 	OrderCustomer,
 	OrderStatus,
@@ -202,6 +203,20 @@ export interface NewsInput {
 }
 
 /**
+ * Campos que acepta el panel al crear o editar una sección del cuerpo de una
+ * noticia.
+ *
+ * `position` en blanco = al final (crear) o sin mover (editar). Si la
+ * posición está ocupada, el backend recorre las demás de esa noticia.
+ */
+export interface NewsSectionInput {
+	position?: number;
+	kind?: NewsSection['kind'];
+	title?: string | null;
+	body?: string[];
+}
+
+/**
  * Campos que acepta el panel al crear o editar una sección de `/project`.
  *
  * `position` en blanco = al final (crear) o sin mover (editar). Si la
@@ -267,6 +282,7 @@ export type {
 	DogVaccine,
 	DonationTier,
 	NewsItem,
+	NewsSection,
 	Order,
 	OrderCustomer,
 	OrderStatus,

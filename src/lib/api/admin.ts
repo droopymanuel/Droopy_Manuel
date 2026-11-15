@@ -19,6 +19,8 @@ import type {
 	DonationTierInput,
 	NewsInput,
 	NewsItem,
+	NewsSection,
+	NewsSectionInput,
 	Order,
 	OrderFilters,
 	OrderPage,
@@ -253,6 +255,32 @@ export async function updateNews(slug: string, input: NewsInput): Promise<NewsIt
 
 export async function deleteNews(slug: string): Promise<void> {
 	await api.delete(`/api/admin/news/${encodeURIComponent(slug)}`);
+}
+
+/** Agrega una sección al cuerpo de una noticia. */
+export async function createNewsSection(
+	slug: string,
+	input: NewsSectionInput
+): Promise<NewsSection> {
+	return api.post<NewsSection>(
+		`/api/admin/news/${encodeURIComponent(slug)}/sections`,
+		input
+	);
+}
+
+export async function updateNewsSection(
+	slug: string,
+	id: number,
+	input: NewsSectionInput
+): Promise<NewsSection> {
+	return api.patch<NewsSection>(
+		`/api/admin/news/${encodeURIComponent(slug)}/sections/${id}`,
+		input
+	);
+}
+
+export async function deleteNewsSection(slug: string, id: number): Promise<void> {
+	await api.delete(`/api/admin/news/${encodeURIComponent(slug)}/sections/${id}`);
 }
 
 // ------------------------------------------------- Contenido del sitio

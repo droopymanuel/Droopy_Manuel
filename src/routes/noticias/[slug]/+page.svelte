@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { categoryLabels } from '#lib/data/news-labels';
+	import { renderRichText } from '#lib/data/rich-text';
 	import { site, pageTitle } from '#lib/site';
 
 	let { data } = $props();
@@ -55,11 +56,33 @@
 				{/if}
 			</header>
 
-			<div class="body">
-				{#each item.body as paragraph}
-					<p>{paragraph}</p>
-				{/each}
-			</div>
+			{#if item.sections && item.sections.length > 0}
+				<div class="body sections">
+					{#each item.sections as section (section.id)}
+						{#if section.kind === 'closing'}
+							<blockquote class="section section-closing">
+								{#if section.title}<h2>{section.title}</h2>{/if}
+								{#each section.body as paragraph}
+									<p>{@html renderRichText(paragraph)}</p>
+								{/each}
+							</blockquote>
+						{:else}
+							<section class:section-hero={section.kind === 'hero'} class="section">
+								{#if section.title}<h2>{section.title}</h2>{/if}
+								{#each section.body as paragraph}
+									<p>{@html renderRichText(paragraph)}</p>
+								{/each}
+							</section>
+						{/if}
+					{/each}
+				</div>
+			{:else}
+				<div class="body">
+					{#each item.body as paragraph}
+						<p>{paragraph}</p>
+					{/each}
+				</div>
+			{/if}
 		</article>
 	{:else}
 		<p class="tagline">📰 Noticias 📰</p>
@@ -188,6 +211,46 @@
 		font-size: 1.0625rem;
 		line-height: 1.65;
 		text-wrap: pretty;
+	}
+
+	.sections {
+		gap: 1.5rem;
+	}
+
+	.section h2 {
+		font-family: var(--font-brand);
+		font-weight: 400;
+		font-size: 1.5rem;
+		line-height: 1.2;
+		color: #7a3f16;
+		margin-bottom: 0.75rem;
+	}
+
+	.section p + p {
+		margin-top: 0.875rem;
+	}
+
+	.section-hero {
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid rgb(122 63 22 / 0.15);
+	}
+
+	.section-hero h2 {
+		font-size: clamp(1.5rem, 5vw, 2rem);
+	}
+
+	.section-closing {
+		margin: 0;
+		padding: 1.25rem;
+		border-radius: 1rem;
+		background: rgb(255 255 255 / 0.65);
+		border: 1px solid rgb(255 255 255 / 0.6);
+		text-align: center;
+		font-size: 1.125rem;
+	}
+
+	.section-closing h2 {
+		text-align: center;
 	}
 
 	.empty {

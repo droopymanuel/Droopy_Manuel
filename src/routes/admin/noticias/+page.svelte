@@ -3,13 +3,47 @@
 	import type { ActionData, PageData } from './$types';
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import AdminToast from '#lib/components/AdminToast.svelte';
-	import type { NewsItem } from '#lib/data/types';
+	import type { NewsItem, NewsSection } from '#lib/data/types';
+	import { NEWS_SECTION_KINDS } from '#lib/data/types';
 	import { categoryEmoji, categoryLabels } from '#lib/data/news-labels';
+	import { newsSectionKindLabels } from '#lib/data/news-section-labels';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let editing = $state<NewsItem | null>(null);
 	let showForm = $state(false);
+
+	/** Sección del cuerpo en edición; `null` = agregar una nueva. */
+	let sectionEditing = $state<NewsSection | null>(null);
+	let sectionKind = $state('chapter');
+	let sectionTitle = $state('');
+	let sectionBody = $state('');
+
+	/** Secciones de la noticia que se está editando. */
+	let currentSections = $derived(editing ? (data.sectionsByNews[editing.slug] ?? []) : []);
+
+	function startSectionCreate() {
+		sectionEditing = null;
+		sectionKind = 'chapter';
+		sectionTitle = '';
+		sectionBody = '';
+	}
+
+	function startSectionEdit(section: NewsSection) {
+		sectionEditing = section;
+		sectionKind = section.kind;
+		sectionTitle = section.title ?? '';
+		sectionBody = section.body.join('\n');
+	}
+
+	function resetSectionForm() {
+		startSectionCreate();
+	}
+
+	/** Posición sugerida para una sección nueva: después de la última. */
+	let nextSectionPosition = $derived(
+		currentSections.length === 0 ? 1 : Math.max(...currentSections.map((s) => s.position)) + 1
+	);
 
 	/** Etiqueta con emoji, como se muestra en el selector y la tabla. */
 	function categoryTag(category: string): string {
@@ -18,22 +52,22 @@
 		return emoji ? `${emoji} ${label}` : label;
 	}
 
-	/** El cuerpo se edita como texto: un párrafo por línea. */
-	let bodyText = $derived(editing?.body.join('\n\n') ?? '');
-
 	function startCreate() {
 		editing = null;
 		showForm = true;
+		resetSectionForm();
 	}
 
 	function startEdit(item: NewsItem) {
 		editing = item;
 		showForm = true;
+		resetSectionForm();
 	}
 
 	function closeForm() {
 		showForm = false;
 		editing = null;
+		resetSectionForm();
 	}
 
 	/** Fecha corta para la tabla. */
@@ -106,11 +140,6 @@
 				</label>
 
 				<label class="wide">
-					Cuerpo * <span class="hint">(un párrafo por línea; las líneas vacías se ignoran)</span>
-					<textarea name="body" rows="10" required>{bodyText}</textarea>
-				</label>
-
-				<label class="wide">
 					Etiquetas (separadas por coma)
 					<input name="tags" value={editing?.tags.join(', ') ?? ''} placeholder="rescate, cachorros" />
 				</label>
@@ -153,6 +182,168 @@
 				<button class="ghost" type="button" onclick={closeForm}>Cancelar</button>
 			</div>
 		</form>
+
+		{#if editing}
+			<div class="sections-editor">
+				<div class="sections-head">
+					<h3>Secciones del cuerpo</h3>
+				</div>
+				<p class="hint">
+					Reemplazan al cuerpo antiguo. Un párrafo por línea; **negrita** es el único formato.
+				</p>
+
+				{#if currentSections.length === 0}
+					<p class="empty-inline">Sin secciones todavía.</p>
+				{:else}
+					<table class="sections-table">
+						<thead>
+							<tr>
+								<th class="num">#</th>
+								<th>Clase</th>
+								<th>Título</th>
+								<th>Texto</th>
+								<th class="right">Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each currentSections as section, index (section.id)}
+								<tr class:active={sectionEditing?.id === section.id}>
+									<td class="num">{section.position}</td>
+									<td>
+										<span class="tag">
+											{newsSectionKindLabels[section.kind] ?? section.kind}
+										</span>
+									</td>
+									<td>{section.title ?? '—'}</td>
+									<td class="preview">
+										{section.body.length === 0
+											? '—'
+											: `${section.body.length} párrafo${section.body.length === 1 ? '' : 's'} · ${section.body[0]?.slice(0, 50) ?? ''}…`}
+									</td>
+									<td class="right">
+										<div class="row-actions">
+											<form method="POST" action="?/updateSection" use:enhance>
+												<input type="hidden" name="slug" value={editing.slug} />
+												<input type="hidden" name="id" value={section.id} />
+												<input type="hidden" name="position" value={section.position - 1} />
+												<button class="icon" type="submit" disabled={index === 0} title="Subir">
+													↑
+												</button>
+											</form>
+											<form method="POST" action="?/updateSection" use:enhance>
+												<input type="hidden" name="slug" value={editing.slug} />
+												<input type="hidden" name="id" value={section.id} />
+												<input type="hidden" name="position" value={section.position + 1} />
+												<button
+													class="icon"
+													type="submit"
+													disabled={index === currentSections.length - 1}
+													title="Bajar"
+												>
+													↓
+												</button>
+											</form>
+											<button
+												class="icon"
+												type="button"
+												onclick={() => startSectionEdit(section)}
+												title="Editar"
+											>
+												✎
+											</button>
+											<form method="POST" action="?/deleteSection" use:enhance>
+												<input type="hidden" name="slug" value={editing.slug} />
+												<input type="hidden" name="id" value={section.id} />
+												<button
+													class="icon danger"
+													type="submit"
+													title="Borrar"
+													onclick={(event) => {
+														if (!confirm(`¿Borrar la sección ${section.position}?`)) {
+															event.preventDefault();
+														}
+													}}
+												>
+													🗑
+												</button>
+											</form>
+										</div>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				{/if}
+
+				<form
+					class="section-form"
+					method="POST"
+					action={sectionEditing ? '?/updateSection' : '?/addSection'}
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							await update();
+							if (result.type === 'success') resetSectionForm();
+						};
+					}}
+				>
+					<input type="hidden" name="slug" value={editing.slug} />
+					{#if sectionEditing}
+						<input type="hidden" name="id" value={sectionEditing.id} />
+					{/if}
+
+					<div class="grid">
+						<label>
+							Clase *
+							<select
+								name="kind"
+								value={sectionKind}
+								onchange={(event) => (sectionKind = event.currentTarget.value)}
+							>
+								{#each NEWS_SECTION_KINDS as kind (kind)}
+									<option value={kind}>{newsSectionKindLabels[kind]}</option>
+								{/each}
+							</select>
+						</label>
+
+						<label>
+							Posición
+							<input
+								name="position"
+								type="number"
+								min="1"
+								step="1"
+								value={sectionEditing?.position ?? nextSectionPosition}
+							/>
+							<span class="hint">Si está ocupada, las demás se recorren.</span>
+						</label>
+
+						<label class="wide">
+							Título (opcional)
+							<input
+								name="title"
+								value={sectionTitle}
+								placeholder="Sin título = sin encabezado"
+							/>
+						</label>
+
+						<label class="wide">
+							Texto {sectionKind === 'hero' ? '(opcional)' : '*'}
+							<textarea name="body" rows="6">{sectionBody}</textarea>
+							<span class="hint">Un párrafo por línea. **negrita** es el único formato.</span>
+						</label>
+					</div>
+
+					<div class="actions">
+						<button class="primary" type="submit">
+							{sectionEditing ? 'Guardar sección' : 'Agregar sección'}
+						</button>
+						{#if sectionEditing}
+							<button class="ghost" type="button" onclick={resetSectionForm}>Cancelar</button>
+						{/if}
+					</div>
+				</form>
+			</div>
+		{/if}
 	</section>
 {/if}
 
@@ -265,6 +456,66 @@
 		background: #fff;
 		border: 1px solid #e2e5e9;
 		border-radius: 0.625rem;
+	}
+
+	.sections-editor {
+		margin-top: 1.5rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid #e2e5e9;
+	}
+
+	.sections-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.sections-head h3 {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	.empty-inline {
+		margin: 0.75rem 0;
+		padding: 1rem;
+		text-align: center;
+		color: #5b6470;
+		border: 1px dashed #ccd2d9;
+		border-radius: 0.375rem;
+	}
+
+	.sections-table {
+		margin: 0.75rem 0 1rem;
+		border: 1px solid #eef0f3;
+		border-radius: 0.375rem;
+	}
+
+	.sections-table tr.active td {
+		background: #f5f7ff;
+	}
+
+	.num {
+		width: 2.5rem;
+		color: #8b949e;
+	}
+
+	.preview {
+		max-width: 20rem;
+		font-size: 0.875rem;
+		color: #5b6470;
+	}
+
+	.section-form {
+		margin-top: 1rem;
+		padding-top: 1rem;
+		border-top: 1px dashed #e2e5e9;
+	}
+
+	.icon:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
 	}
 
 	.grid {
