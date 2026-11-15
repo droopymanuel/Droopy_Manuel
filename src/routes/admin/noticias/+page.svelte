@@ -70,6 +70,37 @@
 		resetSectionForm();
 	}
 
+	/** Cierra el modal con Escape. */
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && showForm) closeForm();
+	}
+
+	// Bloquea el scroll de la página mientras el modal está abierto.
+	// Al ocultar el scroll, la barra desaparece y el contenido se corre: se
+	// compensa con un padding del ancho exacto de la barra. `$effect` solo
+	// corre en el navegador, así que `document` siempre existe.
+	$effect(() => {
+		if (!showForm) return;
+
+		const body = document.body;
+		const previousOverflow = body.style.overflow;
+		const previousPadding = body.style.paddingRight;
+
+		// Ancho real de la barra (0 en móvil o si no hay scroll).
+		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+		const basePadding = parseFloat(getComputedStyle(body).paddingRight) || 0;
+
+		body.style.overflow = 'hidden';
+		if (scrollbarWidth > 0) {
+			body.style.paddingRight = `${basePadding + scrollbarWidth}px`;
+		}
+
+		return () => {
+			body.style.overflow = previousOverflow;
+			body.style.paddingRight = previousPadding;
+		};
+	});
+
 	/** Fecha corta para la tabla. */
 	function shortDate(iso: string): string {
 		const [year, month, day] = iso.split('-');
@@ -80,6 +111,8 @@
 <svelte:head>
 	<title>Noticias · Panel</title>
 </svelte:head>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <header class="head">
 	<div>
@@ -92,8 +125,27 @@
 <AdminToast {form} />
 
 {#if showForm}
-	<section class="editor">
-		<h2>{editing ? `Editar «${editing.title}»` : 'Nueva noticia'}</h2>
+	<div
+		class="modal-backdrop"
+		role="presentation"
+		onclick={(event) => {
+			if (event.target === event.currentTarget) closeForm();
+		}}
+	>
+		<div
+			class="editor modal-panel"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="news-editor-title"
+		>
+			<div class="modal-head">
+				<h2 id="news-editor-title">
+					{editing ? `Editar «${editing.title}»` : 'Nueva noticia'}
+				</h2>
+				<button class="icon" type="button" onclick={closeForm} title="Cerrar" aria-label="Cerrar">
+					✕
+				</button>
+			</div>
 
 		<form
 			method="POST"
@@ -344,7 +396,8 @@
 				</form>
 			</div>
 		{/if}
-	</section>
+		</div>
+	</div>
 {/if}
 
 {#if data.items.length === 0}
@@ -456,6 +509,38 @@
 		background: #fff;
 		border: 1px solid #e2e5e9;
 		border-radius: 0.625rem;
+	}
+
+	.modal-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		padding: 2rem 1rem;
+		background: rgb(15 23 42 / 0.55);
+		overflow-y: auto;
+	}
+
+	.modal-panel {
+		width: min(56rem, 100%);
+		max-height: calc(100vh - 4rem);
+		margin: 0;
+		overflow-y: auto;
+		box-shadow: 0 1.5rem 3rem rgb(15 23 42 / 0.35);
+	}
+
+	.modal-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.modal-head h2 {
+		margin: 0;
 	}
 
 	.sections-editor {
@@ -727,6 +812,14 @@
 	}
 
 	@media (max-width: 40rem) {
+		.modal-backdrop {
+			padding: 1rem 0.5rem;
+		}
+
+		.modal-panel {
+			max-height: calc(100vh - 2rem);
+		}
+
 		.editor {
 			padding: 0.875rem;
 		}
