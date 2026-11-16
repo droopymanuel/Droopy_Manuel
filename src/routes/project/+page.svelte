@@ -123,6 +123,7 @@
 		margin-bottom: 1.5rem;
 		font-size: 1.125rem;
 		line-height: 1.7;
+		overflow-wrap: anywhere;
 	}
 
 	.chapter h2 {
@@ -153,6 +154,7 @@
 		font-size: 1.1875rem;
 		line-height: 1.7;
 		text-align: center;
+		overflow-wrap: anywhere;
 		text-wrap: pretty;
 	}
 
