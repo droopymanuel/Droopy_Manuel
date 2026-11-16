@@ -137,6 +137,15 @@
 		margin-top: 0.875rem;
 	}
 
+	.chapter :global(a),
+	.closing :global(a) {
+		color: #7a3f16;
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		overflow-wrap: anywhere;
+	}
+
 	.closing {
 		border-radius: 1.25rem;
 		border: 1px solid rgb(255 255 255 / 0.6);
