@@ -206,10 +206,12 @@
 
 	.body {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 1rem;
 		padding: 1.25rem;
 		font-size: 1.0625rem;
 		line-height: 1.65;
+		overflow-wrap: anywhere;
 		text-wrap: pretty;
 	}
 
@@ -223,6 +225,10 @@
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
 		overflow-wrap: anywhere;
+	}
+
+	.section {
+		min-width: 0;
 	}
 
 	.section h2 {
