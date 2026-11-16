@@ -217,6 +217,14 @@
 		gap: 1.5rem;
 	}
 
+	.body :global(a) {
+		color: #7a3f16;
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		overflow-wrap: anywhere;
+	}
+
 	.section h2 {
 		font-family: var(--font-brand);
 		font-weight: 400;
