@@ -59,10 +59,6 @@
 				<BankAccountCard {account} />
 			{/each}
 		</div>
-		<p class="accounts-foot">
-			Datos de ejemplo para desarrollo. Antes de publicar hay que sustituirlos por las cuentas
-			reales de la fundación.
-		</p>
 	</section>
 
 	<div class="dedicate">
@@ -141,13 +137,6 @@
 		grid-template-columns: 1fr;
 		align-items: stretch;
 		gap: 1.25rem;
-	}
-
-	.accounts-foot {
-		margin-top: 1.5rem;
-		text-align: center;
-		font-size: 0.875rem;
-		opacity: 0.7;
 	}
 
 	/* --- Dedicatoria --- */
