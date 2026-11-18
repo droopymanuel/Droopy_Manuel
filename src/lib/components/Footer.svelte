@@ -47,18 +47,18 @@
 	}
 
 	.contact-grid {
-		display: grid;
-		grid-template-columns: repeat(5, auto);
+		display: flex;
+		flex-wrap: wrap;
 		justify-content: center;
-		gap: 0.75rem;
+		gap: 0.5rem;
 	}
 
 	.contact-btn {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 3.5rem;
-		height: 3.5rem;
+		width: 3rem;
+		height: 3rem;
 		border-radius: 50%;
 		border: 1px solid rgb(255 255 255 / 0.6);
 		color: inherit;
@@ -67,8 +67,8 @@
 	}
 
 	.contact-btn img {
-		width: 1.75rem;
-		height: 1.75rem;
+		width: 1.5rem;
+		height: 1.5rem;
 		object-fit: contain;
 	}
 
@@ -76,7 +76,7 @@
 		max-width: 32rem;
 		margin: 1.5rem auto 0;
 		font-family: var(--font-brand);
-		font-size: 1.125rem;
+		font-size: 1rem;
 		line-height: 1.35;
 		text-wrap: balance;
 		opacity: 0.95;
@@ -86,6 +86,27 @@
 		margin-top: 0.5rem;
 		font-size: 0.8125rem;
 		opacity: 0.7;
+	}
+
+	/* Arriba de 430px sobra ancho: botones más grandes y un solo renglón. */
+	@media (min-width: 26.9375rem) {
+		.contact-grid {
+			gap: 0.75rem;
+		}
+
+		.contact-btn {
+			width: 3.5rem;
+			height: 3.5rem;
+		}
+
+		.contact-btn img {
+			width: 1.75rem;
+			height: 1.75rem;
+		}
+
+		.footer-note {
+			font-size: 1.125rem;
+		}
 	}
 
 	@media (hover: hover) {
