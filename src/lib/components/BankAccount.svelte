@@ -71,13 +71,15 @@
 		flex-direction: column;
 		gap: 0.875rem;
 		height: 100%;
-		padding: 1.25rem;
+		min-width: 0;
+		padding: 1rem;
 		border-radius: 1.25rem;
 		border: 1px solid rgb(255 255 255 / 0.6);
 	}
 
 	.bank-head {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: 0.75rem;
 	}
@@ -96,14 +98,16 @@
 
 	.bank-titles {
 		display: grid;
+		flex: 1 1 7rem;
 		min-width: 0;
 	}
 
 	.bank-name {
 		font-family: var(--font-brand);
-		font-size: 1.5rem;
+		font-size: 1.375rem;
 		line-height: 1.15;
 		color: #7a3f16;
+		overflow-wrap: anywhere;
 	}
 
 	.bank-holder {
@@ -112,7 +116,7 @@
 	}
 
 	.bank-kind {
-		margin-left: auto;
+		margin-left: 0;
 		flex-shrink: 0;
 		font-size: 0.75rem;
 		font-weight: 700;
@@ -127,9 +131,10 @@
 	/* El dato a transcribir: grande, con su botón de copiar. */
 	.bank-main {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		gap: 0.75rem;
+		gap: 0.625rem;
 		padding: 0.625rem 0.625rem 0.625rem 0.875rem;
 		border-radius: 0.75rem;
 		background: rgb(255 255 255 / 0.7);
@@ -137,9 +142,11 @@
 	}
 
 	.bank-main-value {
+		min-width: 0;
 		font-family: ui-monospace, 'Cascadia Mono', 'Consolas', monospace;
-		font-size: 1.25rem;
+		font-size: 1.125rem;
 		letter-spacing: 0.02em;
+		overflow-wrap: anywhere;
 		word-break: break-all;
 	}
 
@@ -181,6 +188,34 @@
 
 	.bank-extra dd {
 		opacity: 0.8;
+	}
+
+	/* Arriba de 430px sobra ancho: fila única y datos más grandes. */
+	@media (min-width: 26.9375rem) {
+		.bank {
+			padding: 1.25rem;
+		}
+
+		.bank-head,
+		.bank-main {
+			flex-wrap: nowrap;
+		}
+
+		.bank-name {
+			font-size: 1.5rem;
+		}
+
+		.bank-kind {
+			margin-left: auto;
+		}
+
+		.bank-main {
+			gap: 0.75rem;
+		}
+
+		.bank-main-value {
+			font-size: 1.25rem;
+		}
 	}
 
 	@media (hover: hover) {
