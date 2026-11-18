@@ -19,7 +19,7 @@
 		display: block;
 		overflow: clip;
 		border-radius: 1.25rem;
-		border: 4px solid rgb(128 128 128 / 0.7);
+		border: 1px solid rgb(128 128 128 / 0.7);
 		outline: 1px solid rgb(0 0 0 / 0.1);
 		margin: 0 0 1.5rem;
 		max-width: none;
