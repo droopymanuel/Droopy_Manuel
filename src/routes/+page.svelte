@@ -77,7 +77,7 @@
 		<p class="cards-title" id="news-title">📰 Noticias 📰</p>
 		<div class="news-grid">
 			{#each news as item}
-				<article class="news-card glass">
+				<a class="news-card glass" href={`/noticias/${item.slug}`}>
 					<div class="news-holder" aria-hidden="true">
 						{#if item.photo}
 							<img src={item.photo} alt="" loading="lazy" decoding="async" />
@@ -96,7 +96,7 @@
 						</time>
 						<p>{item.excerpt}</p>
 					</div>
-				</article>
+				</a>
 			{/each}
 		</div>
 		<a class="see-all" href="/noticias">Ver todas →</a>
@@ -122,7 +122,7 @@
 		position: relative;
 		overflow: clip;
 		border-radius: 1.25rem;
-		border: 4px solid rgb(128 128 128 / 0.7);
+		border: 1px solid rgb(128 128 128 / 0.7);
 		outline: 1px solid rgb(0 0 0 / 0.1);
 		margin-block: 1.5rem 3rem;
 		margin-inline: auto;
@@ -221,9 +221,28 @@
 	}
 
 	.news-card {
+		display: block;
+		color: inherit;
+		text-decoration: none;
 		overflow: clip;
 		border-radius: 1.25rem;
-		border: 1px solid rgb(255 255 255 / 0.6);
+		border: 1px solid rgb(128 128 128 / 0.7);
+		outline: 1px solid rgb(0 0 0 / 0.1);
+		transition:
+			transform 0.25s ease,
+			box-shadow 0.25s ease;
+	}
+
+	@media (hover: hover) {
+		.news-card:hover {
+			transform: translateY(-0.25rem);
+			box-shadow: 0 0.75rem 1.5rem rgb(122 63 22 / 0.2);
+		}
+	}
+
+	.news-card:focus-visible {
+		outline: 3px solid #7a3f16;
+		outline-offset: 3px;
 	}
 
 	.news-holder {
