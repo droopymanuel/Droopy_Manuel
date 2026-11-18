@@ -106,6 +106,7 @@
 	.intro {
 		text-align: center;
 		text-wrap: pretty;
+		white-space: pre-line;
 		font-size: 1.125rem;
 		max-width: 36rem;
 		margin: 0 auto 1.5rem;
