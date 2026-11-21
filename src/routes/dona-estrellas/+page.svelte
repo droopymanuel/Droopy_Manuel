@@ -1,7 +1,8 @@
 <script lang="ts">
 	import BankAccountCard from '#lib/components/BankAccount.svelte';
+	import DonationTiers from '#lib/components/DonationTiers.svelte';
 	import StarModal from '#lib/components/StarModal.svelte';
-	import type { BankAccount, Dog } from '#lib/data/types';
+	import type { BankAccount, Dog, DonationTier } from '#lib/data/types';
 	import { pageTitle, site } from '#lib/site';
 	import { useContact } from '#lib/stores/contact.svelte';
 	import { untrack } from 'svelte';
@@ -15,6 +16,7 @@
 	// Todo viene del loader (+page.ts) y, por debajo, de la API.
 	const bankAccounts: BankAccount[] = untrack(() => data.accounts);
 	const donationTargets: Dog[] = untrack(() => data.dogs);
+	const donationTiers: DonationTier[] = untrack(() => data.tiers);
 	const aboutBlurb: string = untrack(() => data.aboutBlurb);
 
 	let open = $state(false);
@@ -51,6 +53,8 @@
 <main class="container stars-page">
 	<p class="tagline">⭐ Dona estrellas ⭐</p>
 	<p class="intro">{aboutBlurb}</p>
+
+	<DonationTiers tiers={donationTiers} />
 
 	<section class="accounts" id="cuentas" aria-labelledby="accounts-title">
 		<h2 class="section-title" id="accounts-title">💳 Cuentas para donar</h2>
