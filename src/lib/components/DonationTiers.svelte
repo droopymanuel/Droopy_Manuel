@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createDonationCheckout } from '#lib/api/donations';
 	import { formatCOP } from '#lib/data/format';
 	import type { DonationTier } from '#lib/data/types';
 
@@ -7,6 +8,28 @@
 	}
 
 	let { tiers }: Props = $props();
+
+	let payingStars = $state<number | null>(null);
+	let payError = $state('');
+
+	async function pay(tier: DonationTier) {
+		if (payingStars !== null) return;
+
+		payingStars = tier.stars;
+		payError = '';
+
+		try {
+			const result = await createDonationCheckout({ stars: tier.stars });
+			// Salir del sitio hacia el checkout de Mercado Pago.
+			window.location.assign(result.initPoint);
+		} catch (err) {
+			payError =
+				err instanceof Error
+					? err.message
+					: 'No pudimos abrir el pago. Intenta de nuevo.';
+			payingStars = null;
+		}
+	}
 </script>
 
 {#if tiers.length > 0}
@@ -36,9 +59,22 @@
 							{/each}
 						</ul>
 					{/if}
+
+					<button
+						type="button"
+						class="pay-btn"
+						onclick={() => pay(tier)}
+						disabled={payingStars !== null}
+					>
+						{payingStars === tier.stars ? 'Abriendo Mercado Pago…' : 'Donar con Mercado Pago'}
+					</button>
 				</article>
 			{/each}
 		</div>
+
+		{#if payError}
+			<p class="pay-error" role="alert">{payError}</p>
+		{/if}
 	</section>
 {/if}
 
@@ -121,6 +157,46 @@
 
 	.tier-perks li + li {
 		margin-top: 0.25rem;
+	}
+
+	.pay-btn {
+		width: 100%;
+		min-height: var(--tap-min);
+		margin-top: 1rem;
+		padding: 0.75rem 1.25rem;
+		border: 0;
+		border-radius: 999px;
+		background: #2e7d32;
+		color: #fff8ef;
+		font-family: var(--font-brand);
+		font-size: 1.125rem;
+		cursor: pointer;
+	}
+
+	.pay-btn:disabled {
+		opacity: 0.65;
+		cursor: wait;
+	}
+
+	.pay-error {
+		margin-top: 1rem;
+		padding: 0.625rem 0.75rem;
+		border-radius: 0.75rem;
+		background: rgb(255 255 255 / 0.85);
+		color: #8a1f11;
+		text-align: center;
+		text-wrap: pretty;
+	}
+
+	@media (hover: hover) {
+		.pay-btn:not(:disabled):hover {
+			background: #388e3c;
+		}
+
+		.pay-btn:focus-visible {
+			outline: 3px solid #7a3f16;
+			outline-offset: 2px;
+		}
 	}
 
 	@media (min-width: 40rem) {
