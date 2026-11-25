@@ -457,6 +457,27 @@ export interface DonationTier {
 	perks: string[];
 }
 
+/** Lo que el navegador manda para abrir Checkout Pro. El precio no viaja. */
+export interface DonationCheckoutPayload {
+	stars: number;
+}
+
+/** Respuesta de `/api/donations/checkout`. */
+export interface DonationCheckoutResult {
+	initPoint: string;
+	preferenceId: string;
+}
+
+/** Estado público de una donación, para la página de resultado. */
+export interface DonationStatus {
+	status: string;
+	statusDetail: string | null;
+	stars: number | null;
+	amountCents: number;
+	currency: string;
+	paidAt: string | null;
+}
+
 /**
  * Testimonio de adopción o voluntariado.
  *
