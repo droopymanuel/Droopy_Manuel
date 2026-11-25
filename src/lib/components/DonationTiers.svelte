@@ -55,7 +55,7 @@
 					{#if tier.perks.length > 0}
 						<ul class="tier-perks">
 							{#each tier.perks as perk (perk)}
-								<li>{perk}</li>
+								{perk}
 							{/each}
 						</ul>
 					{/if}

@@ -4,7 +4,7 @@
 	import { formatCOP } from '#lib/data/format';
 	import type { DonationStatus } from '#lib/data/types';
 	import { pageTitle } from '#lib/site';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, untrack } from 'svelte';
 
 	const title = pageTitle('Estado de tu donación');
 
@@ -16,7 +16,7 @@
 
 	let { data } = $props();
 
-	let status = $state<DonationStatus | null>(data.status);
+	let status = $state<DonationStatus | null>(untrack(() => data.status));
 	let checking = $state(false);
 	let retryError = $state('');
 	let retryTimer: ReturnType<typeof setTimeout> | null = null;
@@ -75,9 +75,8 @@
 		eyebrow="Pago aprobado"
 		title="¡Gracias por sumar estrellas!"
 		message="Tu donación quedó confirmada. Mercado Pago ya nos avisó y tus estrellas se convierten en comida, vacunas y hogar para la manada."
-		note={summary
-			? `Donación: ${summary}. Guarda el comprobante que te dio Mercado Pago.`
-			: 'Guarda el comprobante que te dio Mercado Pago. Si quieres contarnos a quién dedicas tu estrella, escríbenos por WhatsApp.'}
+		detail={summary}
+		note="Guarda el comprobante que te dio Mercado Pago. Si quieres contarnos a quién dedicas tu estrella, escríbenos por WhatsApp."
 		primaryHref="/dona-estrellas"
 		primaryLabel="Donar otra vez"
 		secondaryHref="/manada"
@@ -105,7 +104,8 @@
 		eyebrow="Pago en revisión"
 		title="Aún no nos llega tu pago"
 		message="Todavía no nos llega la confirmación de Mercado Pago. Puede tardar unos segundos; revisa de nuevo en un momento."
-		note={retryError || (summary ? `Donación: ${summary}.` : '')}
+		detail={summary}
+		note={retryError}
 		primaryHref="/dona-estrellas"
 		primaryLabel={canRetry ? (checking ? 'Revisando…' : 'Revisar de nuevo') : 'Volver a donar'}
 		onPrimary={canRetry ? reviewAgain : undefined}
