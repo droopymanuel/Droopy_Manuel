@@ -21,10 +21,9 @@
 
 	let light = $derived(isLightColor(accent));
 	let outline = $derived(light ? "#000" : accent);
-
-	console.log(open, dog.slug)
 	
-	open ? onselect(dog) : undefined
+	// svelte-ignore state_referenced_locally
+	if (open) onselect(dog);
 </script>
 
 <button
