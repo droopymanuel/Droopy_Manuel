@@ -1,25 +1,30 @@
 <script lang="ts">
-	import type { Dog } from '#lib/data/types';
-	import { dogDisplayMeta, getDogDisplayStatus } from '#lib/data/dog-status';
-	import { isLightColor } from '#lib/data/color';
-	import { formatDogAge } from '#lib/data/format';
+	import type { Dog } from "#lib/data/types";
+	import { dogDisplayMeta, getDogDisplayStatus } from "#lib/data/dog-status";
+	import { isLightColor } from "#lib/data/color";
+	import { formatDogAge } from "#lib/data/format";
 
 	interface Props {
 		dog: Dog;
 		onselect: (dog: Dog) => void;
+		open?: boolean;
 	}
 
-	let { dog, onselect }: Props = $props();
+	let { dog, onselect, open }: Props = $props();
 
 	let display = $derived(getDogDisplayStatus(dog.status));
 
 	let meta = $derived(dogDisplayMeta[display]);
 
 	/** Color principal del perrito; ausente = marrón de la marca. */
-	let accent = $derived(dog.color ?? '#7a3f16');
+	let accent = $derived(dog.color ?? "#7a3f16");
 
 	let light = $derived(isLightColor(accent));
-	let outline = $derived(light ? '#000' : accent);
+	let outline = $derived(light ? "#000" : accent);
+
+	console.log(open, dog.slug)
+	
+	open ? onselect(dog) : undefined
 </script>
 
 <button
@@ -35,7 +40,7 @@
 			<span class="dog-initial">{dog.name.charAt(0)}</span>
 			<span class="dog-paw">🐾</span>
 		{/if}
-		{#if display !== 'lost'}
+		{#if display !== "lost"}
 			<span class="status-pill">{meta.emoji} {meta.label}</span>
 		{/if}
 	</span>
@@ -70,7 +75,7 @@
 
 	/* Cinta adhesiva en el color del perrito: la foto está pegada, no flotando. */
 	.dog-card::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: -0.7rem;
 		left: 50%;
