@@ -5,6 +5,7 @@
 	import DogNewsFeed from '#lib/components/DogNewsFeed.svelte';
 	import DogHealthSection from '#lib/components/DogHealthSection.svelte';
 	import DogAccessoriesSection from '#lib/components/DogAccessoriesSection.svelte';
+    import { page } from '$app/state';
 
 	interface Props {
 		dog: Dog | null;
@@ -14,6 +15,8 @@
 	let { dog, onclose }: Props = $props();
 
 	let closing = $state(false);
+
+	let copied = $state(false)
 
 	/** Color principal del perrito; ausente = marrón de la marca. */
 	let accent = $derived(dog?.color ?? '#7a3f16');
@@ -104,6 +107,13 @@
 	function onbackdrop(event: MouseEvent) {
 		if (event.target === event.currentTarget) requestClose();
 	}
+
+	function copyUrl() {
+		const { origin, pathname} = page.url
+		navigator.clipboard.writeText(`${origin}${pathname}?slug=${dog!.slug}`);
+		copied = true;
+		setTimeout(() => copied = false, 5000)
+	}
 </script>
 
 <svelte:window onkeydown={onkeydown} />
@@ -159,6 +169,10 @@
 				<DogAccessoriesSection {accessories} {accent} />
 
 				<DogNewsFeed {news} accent={accent} />
+
+				<button class="copy-url" onclick={copyUrl}>
+					{!copied ? '🔗' : '✅'}
+				</button>
 			</div>
 		</div>
 	</div>
@@ -191,6 +205,7 @@
 		box-shadow: 0 2rem 4rem rgb(0 0 0 / 0.3);
 		scrollbar-color: var(--dog) transparent;
 		animation: sheet-up 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+		position: relative;
 	}
 
 	.modal::-webkit-scrollbar {
@@ -351,6 +366,23 @@
 	.story {
 		font-size: 1.0625rem;
 		line-height: 1.65;
+	}
+
+
+
+	.copy-url {
+		cursor: pointer;
+		padding: 5px 15px;
+		border: none;
+		border-radius: 50%;
+		align-self: flex-end;
+		transition: all 0.06s ease;
+		position: absolute;
+		top: 15px;
+		left: 15px;
+	}
+	.copy-url:hover {
+		transform: scale(1.05);
 	}
 
 	@media (min-width: 48rem) {
