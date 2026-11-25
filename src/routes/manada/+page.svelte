@@ -3,10 +3,13 @@
 	import DogModal from '#lib/components/DogModal.svelte';
 	import type { Dog, PackView } from '#lib/data/types';
 	import { site, pageTitle } from '#lib/site';
+    import { page } from '$app/state';
 
 	const title = pageTitle('Mi manada comunitaria');
 
 	let { data } = $props();
+
+	const slug = page.url.searchParams.get('slug')
 
 	let view = $state<PackView>('alive');
 
@@ -83,7 +86,7 @@
 	<div class="pack-grid">
 		{#each pack as dog (dog.slug)}
 			<div class="print" style="transform: rotate({tiltFor(dog.slug)}deg)">
-				<DogCard {dog} onselect={(d) => (selected = d)} />
+				<DogCard {dog} onselect={(d) => (selected = d)} open={slug?.toLocaleLowerCase() === dog.slug.toLocaleLowerCase()}/>
 			</div>
 		{/each}
 	</div>
